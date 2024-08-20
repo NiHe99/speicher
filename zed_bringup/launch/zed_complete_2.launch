@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<launch>
+    
+    <!-- COMMON -->
+    <arg name="robot_id"                   default="$(optenv ROBOT_ID robot)"/>
+    <arg name="prefix"                     default="$(arg robot_id)_" />
+
+    <!-- CAMERA 2 -->
+    <arg name="camera_model_2"               default="$(optenv JETSON_CAMERA_2_MODEL none)" />
+    <arg name="camera_id_2"                  default="$(optenv JETSON_CAMERA_2_ID rear_rgbd_camera)"/>
+    <arg name="camera_device_id_2"           default="$(optenv JETSON_CAMERA_2_DEVICE_ID 1)" />
+
+    <arg name="tf_camera_prefix_2"           default="$(arg prefix)$(arg camera_id_2)" />
+
+    <arg name="svo_file_2"                   default="" /> <!-- <arg name="svo_file" default="path/to/svo/file.svo"> -->
+    <arg name="stream_2"                     default="" /> <!-- <arg name="stream" default="<ip_address>:<port>"> -->
+
+    <arg name="node_name_2"                  default="$(arg camera_id_2)" />
+
+    <arg name="gpu_id_2"                     default="-1" />
+
+    <arg name="base_frame_2"                 default="$(arg tf_camera_prefix_2)_base_link" />
+    <arg name="camera_frame_2"               default="$(arg tf_camera_prefix_2)_link" />
+
+    <arg name="mapping_enabled_2"            default="false" />
+
+
+    <group ns="$(arg robot_id)" >
+     
+
+	<!-- CAMERA 2 -->
+
+	<group if="$(eval camera_model_2 != 'none')">
+		
+	    <node name="$(arg node_name_2)" pkg="zed_wrapper" type="zed_wrapper_node" output="screen" required="true">
+
+		<rosparam file="$(find zed_bringup)/config/common.yaml" command="load" />
+		<rosparam file="$(find zed_bringup)/config/$(arg camera_model_2).yaml" command="load" />
+
+		<!-- Camera name -->
+		<param name="general/camera_name"               value="$(arg tf_camera_prefix_2)" />
+
+		<!-- Frames -->
+		<param name="general/base_frame"                value="$(arg base_frame_2)" />
+		<param name="general/camera_frame"              value="$(arg camera_frame_2)" />
+
+		<!-- SVO file path -->
+		<param name="svo_file"                          value="$(arg svo_file_2)" />
+
+		<!-- Remote stream -->
+		<param name="stream"                            value="$(arg stream_2)" />
+
+		<!-- Camera ID -->
+		<param name="general/serial_number"             value="$(arg camera_device_id_2)" />
+
+		<!-- GPU ID -->
+		<param name="general/gpu_id"                    value="$(arg gpu_id_2)" />
+
+		<!-- Mapping -->
+		<param name="mapping/mapping_enabled"           value="$(arg mapping_enabled_2)" />
+
+	    </node>
+
+	</group>
+
+</group>
+
+</launch>
